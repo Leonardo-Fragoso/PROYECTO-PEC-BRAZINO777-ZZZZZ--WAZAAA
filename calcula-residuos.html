@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoVivo - Calcula tus residuos</title>
+
+<!-- PyScript: permite ejecutar Python dentro de la página (necesita internet) -->
+<link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
+<script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+
+<style>
+  .aviso { background-color:#fffde7; border:2px solid #fbc02d; border-radius:8px; padding:8px 12px; font-weight:bold; }
+  .nota { font-size:0.9rem; color:#546e7a; margin-bottom:0; }
+  .cargando { background-color:#e1f5fe; border:2px solid #0288d1; color:#0288d1; border-radius:8px; padding:8px 12px; font-weight:bold; }
+  .campo { margin-bottom:14px; }
+  .campo label { display:block; font-weight:bold; margin-bottom:4px; }
+  .campo input { width:100%; box-sizing:border-box; font-family:inherit; font-size:1rem; padding:10px 12px; color:#263238; background-color:#ffffff; border:2px solid #2e7d32; border-radius:8px; }
+  .campo-personas { background-color:#e1f5fe; border:2px solid #0288d1; border-radius:8px; padding:12px 15px; }
+  .campo-personas label { color:#0288d1; }
+  .campo-personas input { border-color:#0288d1; }
+  .rejilla { display:grid; grid-template-columns:repeat(2, 1fr); gap:0 15px; }
+  .botones { display:flex; flex-wrap:wrap; gap:10px; }
+  .boton { font-family:inherit; font-size:1.05rem; font-weight:bold; border:none; border-radius:8px; padding:12px 24px; cursor:pointer; }
+  .boton:disabled { opacity:0.5; cursor:not-allowed; }
+  .boton-principal { color:#2e7d32; background-color:#fbc02d; }
+  .boton-secundario { color:#ffffff; background-color:#0288d1; }
+  .errores { background-color:#ffebee; border:2px solid #c62828; color:#b71c1c; border-radius:8px; padding:10px 15px; margin-bottom:15px; }
+  .errores ul { margin:6px 0 0 0; padding-left:20px; }
+  .tarjeta { background-color:#ffffff; border-radius:10px; padding:18px 20px; margin-bottom:25px; border-left:6px solid #2e7d32; box-shadow:0 2px 5px rgba(0, 0, 0, 0.1); }
+  .tarjeta h2 { color:#2e7d32; margin-top:0; }
+  .periodos { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; }
+  .periodo { text-align:center; background-color:#e8f5e9; border:2px solid #2e7d32; border-radius:8px; padding:10px 6px; }
+  .periodo span { display:block; font-size:0.9rem; }
+  .periodo strong { display:block; font-size:1.3rem; color:#2e7d32; }
+  .categorias { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
+  .categoria { background-color:#e1f5fe; border:2px solid #0288d1; border-radius:8px; padding:10px 14px; }
+  .categoria h3 { margin:0; color:#0288d1; font-size:1.05rem; }
+  .porcentaje { margin:2px 0 6px 0; font-weight:bold; }
+  .categoria ul { list-style:none; margin:8px 0 0 0; padding:0; font-size:0.95rem; }
+  .barra { height:10px; background-color:#ffffff; border-radius:5px; overflow:hidden; }
+  .barra-relleno { height:100%; background-color:#2e7d32; border-radius:5px; }
+  .nivel { border-radius:8px; padding:10px 15px; border:2px solid; }
+  .nivel p { margin:4px 0 0 0; }
+  .nivel-baja { background-color:#e8f5e9; border-color:#2e7d32; color:#1b5e20; }
+  .nivel-media { background-color:#fffde7; border-color:#fbc02d; color:#6d5400; }
+  .nivel-alta { background-color:#ffebee; border-color:#c62828; color:#b71c1c; }
+  .consejos { margin:0; padding-left:20px; }
+  .consejos li { margin-bottom:6px; }
+  @media (max-width:800px) {
+    .periodos { grid-template-columns:repeat(2, 1fr); }
+    .categorias { grid-template-columns:repeat(2, 1fr); }
+  }
+  @media (max-width:600px) {
+    .rejilla, .categorias { grid-template-columns:1fr; }
+    .boton { width:100%; }
+  }
+</style>
+</head>
+<body style="margin:0; font-family: Arial, Helvetica, sans-serif; background-color:#ffffff; color:#263831; line-height:1.6;">
+
+<header style="background-color:#2e7d32; color:#ffffff; padding:20px; text-align:center; border-bottom:5px solid #fbc02d;">
+  <h1 style="margin:0 0 15px 0; font-size:1.8rem;">Calcula Tus Residuos</h1>
+  <p style="margin:0 0 15px 0;">Separación, Reducción y Manejo de Residuos</p>
+  <nav>
+    <a href="index.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Inicio</a>
+    <a href="galeria.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Galería</a>
+    <a href="plantas.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Plantas</a>
+    <a href="herramientas.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Herramientas</a>
+    <a href="calcula-residuos.html" style="display:inline-block; color:#2e7d32; background-color:#fbc02d; text-decoration:none; font-weight:bold; padding:8px 16px; border-radius:8px; margin:4px;">Calcula tus residuos</a>
+    <a href="juego.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Juego</a>
+  </nav>
+</header>
+
+<main style="max-width:900px; margin:0 auto; padding:20px;">
+
+  <section class="tarjeta">
+    <h2>♻️ Calcula tus residuos</h2>
+    <p>Escribe cuántos kilogramos de cada tipo de residuo genera <strong>una persona</strong> aproximadamente en un día. Los campos vacíos se toman como 0.</p>
+    <p class="aviso">Es una estimación educativa, no una medición científica exacta.</p>
+    <p id="cargando" class="cargando">⏳ Cargando Python... espera unos segundos (se necesita internet).</p>
+
+    <div id="mensajes"></div>
+
+    <div class="campo campo-personas">
+      <label for="personas">👨‍👩‍👧 ¿Para cuántas personas quieres calcular la generación de residuos?</label>
+      <input type="number" id="personas" min="1" step="1" placeholder="Ejemplo: 4">
+    </div>
+    <br>
+    <div class="rejilla">
+      <div class="campo"><label for="organicos">🥬 Residuos orgánicos</label><input type="number" id="organicos" min="0" step="any" placeholder="kg por persona al día"></div>
+      <div class="campo"><label for="plasticos">🧴 Plásticos</label><input type="number" id="plasticos" min="0" step="any" placeholder="kg por persona al día"></div>
+      <div class="campo"><label for="papel">📄 Papel y cartón</label><input type="number" id="papel" min="0" step="any" placeholder="kg por persona al día"></div>
+      <div class="campo"><label for="vidrio">🍾 Vidrio</label><input type="number" id="vidrio" min="0" step="any" placeholder="kg por persona al día"></div>
+      <div class="campo"><label for="metales">🔩 Metales</label><input type="number" id="metales" min="0" step="any" placeholder="kg por persona al día"></div>
+      <div class="campo"><label for="otros">🗑️ Otros residuos</label><input type="number" id="otros" min="0" step="any" placeholder="kg por persona al día"></div>
+    </div>
+
+    <div class="botones">
+      <button id="calcular" class="boton boton-principal" disabled>♻️ Calcular mis residuos</button>
+      <button id="reiniciar" class="boton boton-secundario" disabled>🔄 Calcular nuevamente</button>
+    </div>
+  </section>
+
+  <div id="resultados"></div>
+
+</main>
+
+<footer style="background-color:#1b5e20;; color:#ffffff; padding:20px; text-align:center;">
+  <p style="margin:5px 0 0 0;">Calcula Residuos - Proyecto Escuela Comunidad, Preparatoria CECYTEM TULTITLAN.</p>
+</footer>
+
+<!-- Código en Python de la calculadora -->
+<script type="py">
+# Calcula tus residuos - lógica en Python (corre dentro de la página con PyScript)
+import math
+from pyscript import document, when
+
+CATEGORIAS = [
+    ("organicos", "🥬", "Residuos orgánicos"),
+    ("plasticos", "🧴", "Plásticos"),
+    ("papel", "📄", "Papel y cartón"),
+    ("vidrio", "🍾", "Vidrio"),
+    ("metales", "🔩", "Metales"),
+    ("otros", "🗑️", "Otros residuos"),
+]
+
+CONSEJO_CATEGORIA = {
+    "organicos": "Aprovecha restos de fruta, verdura y hojas para hacer composta y abonar tus plantas.",
+    "plasticos": "Lleva una botella reutilizable y evita envases y bolsas de plástico de un solo uso.",
+    "papel": "Usa ambos lados de las hojas y junta el papel y cartón limpios para reciclarlos.",
+    "vidrio": "Reutiliza frascos y botellas de vidrio; el vidrio se puede reciclar muchas veces.",
+    "metales": "Enjuaga las latas y llévalas a reciclar; el metal se recicla una y otra vez.",
+    "otros": "Revisa qué hay en tu bote de otros residuos: muchas cosas se pueden reducir, reutilizar o separar.",
+}
+
+CONSEJOS_GENERALES = [
+    "Antes de comprar, pregúntate si realmente lo necesitas y elige productos con menos empaque.",
+    "Separa tus residuos en orgánicos, plásticos, papel y cartón, vidrio, metales y otros.",
+    "Repara y reutiliza objetos antes de tirarlos: bolsas, frascos, cajas y ropa.",
+]
+
+MAX_PERSONAS = 100000
+MAX_KG = 100
+
+
+def kg(valor):
+    return f"{valor:,.2f}"
+
+
+def leer_numero(texto):
+    """Texto -> número. Vacío = 0. Devuelve (valor, error)."""
+    texto = texto.strip().replace(",", ".")
+    if texto == "":
+        return 0.0, False
+    try:
+        valor = float(texto)
+    except ValueError:
+        return None, True
+    if not math.isfinite(valor):
+        return None, True
+    return valor, False
+
+
+def calcular(texto_personas, textos):
+    """Devuelve (lista_de_errores, resultado). Si hay errores, resultado es None."""
+    errores = []
+
+    personas = None
+    texto_personas = texto_personas.strip()
+    if texto_personas == "":
+        errores.append("Escribe para cuántas personas quieres calcular.")
+    else:
+        try:
+            personas = int(texto_personas)
+        except ValueError:
+            errores.append("El número de personas debe ser un número entero (sin decimales).")
+        else:
+            if personas <= 0:
+                errores.append("El número de personas debe ser mayor que 0.")
+            elif personas > MAX_PERSONAS:
+                errores.append("El número de personas es demasiado grande.")
+
+    por_persona = {}
+    for clave, emoji, nombre in CATEGORIAS:
+        valor, malo = leer_numero(textos[clave])
+        if malo:
+            errores.append(nombre + ": escribe un número válido.")
+        elif valor < 0:
+            errores.append(nombre + ": no puede ser negativo.")
+        elif valor > MAX_KG:
+            errores.append(nombre + ": el valor es demasiado grande (máximo 100 kg por persona al día).")
+        else:
+            por_persona[clave] = valor
+
+    if errores:
+        return errores, None
+
+    total_diario = sum(por_persona.values())
+    if total_diario == 0:
+        return ["Todos los residuos están en 0. Escribe una cantidad mayor que 0 en al menos una categoría."], None
+
+    total_hogar = total_diario * personas
+    filas = []
+    for clave, emoji, nombre in CATEGORIAS:
+        diario = por_persona[clave] * personas
+        filas.append({
+            "clave": clave, "emoji": emoji, "nombre": nombre,
+            "porcentaje": por_persona[clave] / total_diario * 100,
+            "diario": diario, "semanal": diario * 7, "mensual": diario * 30, "anual": diario * 365,
+        })
+    mayor = max(filas, key=lambda f: f["porcentaje"])
+
+    if total_diario <= 0.6:
+        nivel = "baja"
+        texto_nivel = ("Tu generación estimada de residuos es relativamente baja. "
+                       "Continúa reduciendo, reutilizando y separando correctamente.")
+    elif total_diario <= 1.2:
+        nivel = "media"
+        texto_nivel = ("Tu generación de residuos es moderada. Puedes reducirla utilizando "
+                       "productos reutilizables y evitando residuos innecesarios.")
+    else:
+        nivel = "alta"
+        texto_nivel = ("Tu generación estimada es elevada. Intenta reducir residuos, "
+                       "reutilizar materiales y separar correctamente los reciclables.")
+
+    return [], {
+        "personas": personas, "por_persona": total_diario,
+        "diario": total_hogar, "semanal": total_hogar * 7,
+        "mensual": total_hogar * 30, "anual": total_hogar * 365,
+        "filas": filas, "mayor": mayor, "nivel": nivel, "texto_nivel": texto_nivel,
+        "consejos": [CONSEJO_CATEGORIA[mayor["clave"]]] + CONSEJOS_GENERALES,
+    }
+
+
+def html_resultados(r):
+    texto_personas = "persona" if r["personas"] == 1 else "personas"
+    h = '<section class="tarjeta"><h2>♻️ RESULTADOS</h2>'
+    h += f'<p>Estimación para <strong>{r["personas"]}</strong> {texto_personas} ({kg(r["por_persona"])} kg por persona al día).</p>'
+    h += '<div class="periodos">'
+    for titulo, clave in [("Generación diaria", "diario"), ("Generación semanal", "semanal"),
+                          ("Generación mensual", "mensual"), ("Generación anual", "anual")]:
+        h += f'<div class="periodo"><span>{titulo}</span><strong>{kg(r[clave])} kg</strong></div>'
+    h += '</div><p class="nota">Semana = 7 días, mes = 30 días, año = 365 días.</p></section>'
+
+    h += '<section class="tarjeta"><h2>🌿 Residuos por categoría</h2><div class="categorias">'
+    for f in r["filas"]:
+        h += '<article class="categoria">'
+        h += f'<h3>{f["emoji"]} {f["nombre"]}</h3>'
+        h += f'<p class="porcentaje">{f["porcentaje"]:.1f}% del total</p>'
+        h += f'<div class="barra"><div class="barra-relleno" style="width:{f["porcentaje"]:.1f}%;"></div></div>'
+        h += '<ul>'
+        h += f'<li>Diario: <strong>{kg(f["diario"])} kg</strong></li>'
+        h += f'<li>Semanal: <strong>{kg(f["semanal"])} kg</strong></li>'
+        h += f'<li>Mensual: <strong>{kg(f["mensual"])} kg</strong></li>'
+        h += f'<li>Anual: <strong>{kg(f["anual"])} kg</strong></li>'
+        h += '</ul></article>'
+    h += '</div>'
+    h += f'<p class="nota">La categoría que más residuos genera es <strong>{r["mayor"]["nombre"]}</strong>.</p></section>'
+
+    h += '<section class="tarjeta"><h2>📊 Interpretación</h2>'
+    h += f'<div class="nivel nivel-{r["nivel"]}"><strong>Generación {r["nivel"]}</strong><p>{r["texto_nivel"]}</p></div>'
+    h += ('<p class="nota">Estos niveles son referencias educativas creadas para el proyecto '
+          '(baja: hasta 0.6 kg, media: hasta 1.2 kg, alta: más de 1.2 kg por persona al día) '
+          'y no una clasificación oficial.</p></section>')
+
+    h += '<section class="tarjeta"><h2>💡 Consejos</h2><ul class="consejos">'
+    for c in r["consejos"]:
+        h += f'<li>{c}</li>'
+    h += '</ul></section>'
+    return h
+
+
+def leer_formulario():
+    textos = {}
+    for clave, emoji, nombre in CATEGORIAS:
+        textos[clave] = document.querySelector("#" + clave).value
+    return document.querySelector("#personas").value, textos
+
+
+@when("click", "#calcular")
+def al_calcular(event):
+    texto_personas, textos = leer_formulario()
+    errores, resultado = calcular(texto_personas, textos)
+    mensajes = document.querySelector("#mensajes")
+    salida = document.querySelector("#resultados")
+    if errores:
+        lista = "".join(f"<li>{e}</li>" for e in errores)
+        mensajes.innerHTML = f'<div class="errores"><strong>Revisa tus datos:</strong><ul>{lista}</ul></div>'
+        salida.innerHTML = ""
+    else:
+        mensajes.innerHTML = ""
+        salida.innerHTML = html_resultados(resultado)
+        salida.scrollIntoView()
+
+
+@when("click", "#reiniciar")
+def al_reiniciar(event):
+    document.querySelector("#personas").value = ""
+    for clave, emoji, nombre in CATEGORIAS:
+        document.querySelector("#" + clave).value = ""
+    document.querySelector("#mensajes").innerHTML = ""
+    document.querySelector("#resultados").innerHTML = ""
+
+
+# Python ya cargó: ocultar el aviso y activar los botones
+document.querySelector("#cargando").style.display = "none"
+document.querySelector("#calcular").disabled = False
+document.querySelector("#reiniciar").disabled = False
+</script>
+
+</body>
+</html>

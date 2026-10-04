@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galería - EcoVivo</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Comic Sans MS', Arial, Helvetica, sans-serif;
+    background-color: #e8f5e9;
+    color: #263238;
+    line-height: 1.6;
+  }
+
+  header {
+    background-color: #1b5e20;
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 5px solid #ffb300;
+  }
+
+  header h1 {
+    margin: 0 0 15px 0;
+    font-size: 1.8rem;
+  }
+
+  nav a {
+    display: inline-block;
+    color: #ffffff;
+    background-color: #0288d1;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin: 4px;
+  }
+
+  nav a.activa {
+    font-weight: bold;
+    background-color: #ffb300;
+    color: #1b5e20;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  section {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 25px;
+    border-left: 6px solid #4caf50;
+  }
+
+  section h2 {
+    color: #1b5e20;
+    margin-top: 0;
+  }
+
+  figure {
+    display: inline-block;
+    background-color: #e8f5e9;
+    border: 2px solid #4caf50;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 8px;
+    text-align: center;
+    width: 200px;
+  }
+
+  figure img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  figcaption {
+    font-weight: bold;
+    color: #1b5e20;
+    margin-top: 6px;
+  }
+
+  video {
+    width: 100%;
+    max-width: 600px;
+    display: block;
+    margin: 10px auto;
+    border: 3px solid #4caf50;
+    border-radius: 8px;
+  }
+
+  footer {
+    background-color: #1b5e20;
+    color: #ffffff;
+    padding: 15px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Galería de Actividades y Evidencias</h1>
+  <nav>
+    <a href="index.html">Inicio</a>
+    <a href="galeria.html" class="activa">Galería</a>
+    <a href="plantas.html">Plantas</a>
+    <a href="herramientas.html">Herramientas</a>
+    <a href="calcula-residuos.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Calcula tus residuos</a>
+    <a href="juego.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Juego</a>
+  </nav>
+</header>
+
+<main>
+
+  <section>
+    <h2>Fotográficas</h2>
+    <p>
+      Estas son algunas imagenes sobre lo que se debe hacer:
+    </p>
+
+    <article>
+      <figure>
+        <img src="img/persona-sembrando.jpg" alt="persona-sembrando" height="400">
+        <figcaption>Siembra</figcaption>
+      </figure>
+      <figure>
+        <img src="img/limpieza.jpg" alt="persona-limpiando">
+        <figcaption>Limpieza</figcaption>
+      </figure>
+      <figure>
+        <img src="img/sembrando-semillas.jpg" alt="riego">
+        <figcaption>Riego</figcaption>
+      </figure>
+    </article>
+
+    <article>
+      <figure>
+        <img src="img/semillas-jitomate.jpg" alt="siembra">
+        <figcaption>Siembra</figcaption>
+      </figure>
+      <figure>
+        <img src="img/clasificacion-residuos.jpg" alt="persona clasificando residuos">
+        <figcaption>Limpieza</figcaption>
+      </figure>
+      <figure>
+        <img src="img/revision-huerto.jpg" alt="Estudiantes revisando el riego del huerto">
+        <figcaption>Riego</figcaption>
+      </figure>
+    </article>
+  </section>
+
+  <section>
+    <h2>Video: Poda Segura de Nuestras Plantas</h2>
+    <iframe width="700" height="315" src="https://www.youtube.com/embed/uuJ6-5NhFQE" title="TIP´S PARA UNA CORRECTA PODA PARA TUS ÁRBOLES" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </section>
+
+</main>
+
+<footer>
+  <p>Galería de Actividades - Proyecto Escuela Comunidad, Preparatoria CECYTEM TULTITLAN</p>
+</footer>
+
+</body>
+</html>

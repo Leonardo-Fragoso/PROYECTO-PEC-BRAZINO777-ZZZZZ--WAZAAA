@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naturaleza Digital - Bienvenida</title>
+
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    background-color: #ffffff;
+    color: #263238;
+    line-height: 1.6;
+  }
+
+  /* ---------- Cielo y pradera (parte de arriba) ---------- */
+  .cielo {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    background: linear-gradient(#4fc3f7 0%, #b3e5fc 70%, #e1f5fe 100%);
+    border-bottom: 5px solid #fbc02d;
+  }
+
+  .sol {
+    position: absolute;
+    top: 18px;
+    right: 6%;
+    width: 110px;
+    height: 110px;
+    color: #fbc02d;
+    animation: girar 40s linear infinite;
+  }
+
+  .nube { position: absolute; width: 130px; height: 70px; color: #ffffff; opacity: 0.95; animation: flotar 9s ease-in-out infinite alternate; }
+  .nube-1 { top: 40px; left: 5%; }
+  .nube-2 { top: 120px; left: 22%; width: 90px; height: 50px; animation-duration: 12s; }
+  .nube-3 { top: 70px; right: 28%; width: 100px; height: 55px; animation-duration: 10s; }
+
+  .hoja-cae {
+    position: absolute;
+    top: -40px;
+    width: 28px;
+    height: 28px;
+    color: #66bb6a;
+    animation: caer 12s linear infinite;
+  }
+
+  .hero-contenido {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 50px 20px 30px 20px;
+  }
+
+  .hero-contenido .saludo {
+    display: inline-block;
+    background-color: #fffde7;
+    color: #2e7d32;
+    border: 3px solid #fbc02d;
+    border-radius: 22px;
+    padding: 4px 16px;
+    font-weight: bold;
+    font-size: 1rem;
+    line-height: 1.3;
+    margin: 0 0 12px 0;
+  }
+
+  .hero-contenido h1 {
+    margin: 0 0 12px 0;
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    line-height: 1.15;
+    color: #1b5e20;
+    text-shadow: 2px 2px 0 #ffffff;
+  }
+
+  .hero-contenido p { margin: 0 auto 22px auto; font-size: 1.2rem; max-width: 600px; }
+
+  .boton-grande {
+    display: inline-block;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #2e7d32;
+    background-color: #fbc02d;
+    text-decoration: none;
+    padding: 14px 34px;
+    border-radius: 40px;
+    border-bottom: 6px solid #f9a825;
+    transition: transform 0.15s;
+  }
+  .boton-grande:hover { transform: translateY(-3px) scale(1.04); }
+  .boton-grande:focus-visible, .boton:focus-visible { outline: 4px solid #0288d1; outline-offset: 3px; }
+
+  .pradera {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 14px;
+    padding: 0 10px;
+    margin-bottom: -6px;
+  }
+  .planta { flex: 0 0 auto; transform-origin: 50% 100%; animation: balanceo 4s ease-in-out infinite alternate; }
+  .p-arbol-g { width: 170px; height: 170px; }
+  .p-arbol-m { width: 125px; height: 125px; animation-delay: -1.5s; }
+  .p-flor    { width: 80px;  height: 80px; animation-delay: -0.8s; }
+  .p-brote   { width: 70px;  height: 70px; animation-delay: -2.2s; }
+  .p-hoja    { width: 70px;  height: 70px; animation-delay: -3s; }
+  .flor-roja { color: #e53935; }
+  .flor-rosa { color: #ec407a; }
+  .flor-morada { color: #ab47bc; }
+  .flor-naranja { color: #fb8c00; }
+
+  .cesped {
+    height: 40px;
+    background-color: #43a047;
+    border-top: 8px solid #66bb6a;
+  }
+
+  /* ---------- Contenido ---------- */
+  main { max-width: 900px; margin: 0 auto; padding: 30px 20px 10px 20px; }
+
+  .seccion { margin-bottom: 40px; }
+  .seccion h2 {
+    text-align: center;
+    color: #2e7d32;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin: 0 0 6px 0;
+  }
+  .subtitulo { text-align: center; margin: 0 0 20px 0; font-size: 1.1rem; }
+
+  .rejilla { display: grid; gap: 16px; }
+  .rejilla-3 { grid-template-columns: repeat(3, 1fr); }
+  .rejilla-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .tarjeta {
+    border-radius: 20px;
+    padding: 18px 16px;
+    text-align: center;
+    border: 3px solid;
+  }
+  .tarjeta h3 { margin: 8px 0 6px 0; font-size: 1.3rem; }
+  .tarjeta p { margin: 0; }
+  .icono {
+    display: inline-block;
+    width: 74px;
+    height: 74px;
+    line-height: 74px;
+    font-size: 2.4rem;
+    background-color: #ffffff;
+    border-radius: 50%;
+  }
+  .t-verde    { background-color: #e8f5e9; border-color: #2e7d32; }
+  .t-verde h3 { color: #2e7d32; }
+  .t-azul     { background-color: #e1f5fe; border-color: #0288d1; }
+  .t-azul h3  { color: #0288d1; }
+  .t-amarillo { background-color: #fffde7; border-color: #fbc02d; }
+  .t-amarillo h3 { color: #f9a825; }
+
+  /* Botes de colores */
+  .bote { background-color: #ffffff; border: 3px solid #eceff1; border-radius: 20px; padding: 14px 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .bote svg { width: 90px; height: 90px; }
+  .bote h3 { margin: 4px 0 4px 0; font-size: 1.15rem; }
+  .bote p { margin: 0; font-size: 0.95rem; }
+  .bote-verde    { color: #2e7d32; }
+  .bote-azul     { color: #0288d1; }
+  .bote-amarillo { color: #fbc02d; }
+  .bote-gris     { color: #607d8b; }
+  .bote-verde h3 { color: #2e7d32; }
+  .bote-azul h3  { color: #0288d1; }
+  .bote-amarillo h3 { color: #f9a825; }
+  .bote-gris h3  { color: #455a64; }
+  .bote p { color: #263238; }
+
+  /* Las 3 R */
+  .erre { display: flex; align-items: center; gap: 14px; text-align: left; }
+  .erre .numero {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    line-height: 56px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #2e7d32;
+    border-radius: 50%;
+  }
+  .erre h3 { margin: 0; }
+
+  /* Invitación final */
+  .invitacion {
+    text-align: center;
+    background-color: #e8f5e9;
+    border: 3px dashed #2e7d32;
+    border-radius: 24px;
+    padding: 24px 16px;
+  }
+  .invitacion h2 { margin-top: 0; }
+  .botones { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 16px; }
+  .boton {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #0288d1;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 30px;
+    border-bottom: 5px solid #01579b;
+  }
+  .boton:hover { filter: brightness(1.1); }
+  .boton-verde { background-color: #2e7d32; border-bottom-color: #1b5e20; }
+
+  .pie {
+    background-color: #263238;
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+  }
+  .pie p { margin: 0; }
+  .pie p + p { margin-top: 5px; }
+
+  /* ---------- Animaciones (solo CSS) ---------- */
+  @keyframes balanceo { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+  @keyframes flotar   { from { transform: translateX(-12px); } to { transform: translateX(12px); } }
+  @keyframes girar    { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes caer {
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { transform: translate(25px, 230px) rotate(180deg); }
+    90%  { opacity: 1; }
+    100% { transform: translate(-15px, 460px) rotate(360deg); opacity: 0; }
+  }
+
+  /* ---------- Pantallas pequeñas ---------- */
+  @media (max-width: 800px) {
+    .rejilla-4 { grid-template-columns: repeat(2, 1fr); }
+    .sol { width: 80px; height: 80px; }
+  }
+  @media (max-width: 600px) {
+    .rejilla-3 { grid-template-columns: 1fr; }
+    .p-arbol-g { width: 100px; height: 100px; }
+    .p-arbol-m { width: 75px; height: 75px; }
+    .p-flor { width: 45px; height: 45px; }
+    .p-brote, .p-hoja { width: 40px; height: 40px; }
+    .pradera { gap: 4px; padding: 0; }
+    .solo-grande { display: none; }
+    .boton-grande { font-size: 1.2rem; padding: 12px 26px; }
+    .boton { width: 100%; text-align: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sol, .nube, .hoja-cae, .planta { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Dibujos reutilizables (plantas, hoja, nube, sol, bote). No se ven por sí solos. -->
+<svg width="0" height="0" style="position:absolute;" aria-hidden="true">
+  <defs>
+    <symbol id="arbol" viewBox="0 0 100 100">
+      <rect x="44" y="55" width="12" height="42" rx="3" fill="#8d6e63"/>
+      <circle cx="30" cy="48" r="18" fill="#388e3c"/>
+      <circle cx="70" cy="48" r="18" fill="#388e3c"/>
+      <circle cx="50" cy="36" r="26" fill="#2e7d32"/>
+      <circle cx="50" cy="28" r="15" fill="#43a047"/>
+      <circle cx="38" cy="40" r="4" fill="#e53935"/>
+      <circle cx="62" cy="34" r="4" fill="#e53935"/>
+      <circle cx="52" cy="52" r="4" fill="#e53935"/>
+    </symbol>
+
+    <symbol id="flor" viewBox="0 0 100 100">
+      <path d="M50 97 C50 80 50 65 50 48" stroke="#2e7d32" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="36" cy="76" rx="14" ry="7" fill="#43a047" transform="rotate(-25 36 76)"/>
+      <ellipse cx="64" cy="68" rx="14" ry="7" fill="#43a047" transform="rotate(25 64 68)"/>
+      <g fill="currentColor">
+        <circle cx="50" cy="26" r="11"/>
+        <circle cx="64" cy="36" r="11"/>
+        <circle cx="58" cy="52" r="11"/>
+        <circle cx="42" cy="52" r="11"/>
+        <circle cx="36" cy="36" r="11"/>
+      </g>
+      <circle cx="50" cy="40" r="9" fill="#fbc02d"/>
+    </symbol>
+
+    <symbol id="brote" viewBox="0 0 100 100">
+      <path d="M50 97 C50 80 50 62 50 48" stroke="#558b2f" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M50 52 C20 52 10 30 12 18 C38 16 52 30 50 52 Z" fill="#66bb6a"/>
+      <path d="M50 62 C78 62 90 42 88 30 C64 28 50 42 50 62 Z" fill="#43a047"/>
+      <ellipse cx="50" cy="97" rx="22" ry="5" fill="#8d6e63"/>
+    </symbol>
+
+    <symbol id="hoja" viewBox="0 0 100 100">
+      <path d="M50 92 C8 62 18 16 50 8 C82 16 92 62 50 92 Z" fill="currentColor"/>
+      <path d="M50 88 L50 24" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <path d="M50 60 L34 46 M50 46 L66 34 M50 72 L68 58" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    </symbol>
+
+    <symbol id="nube" viewBox="0 0 130 70">
+      <g fill="currentColor">
+        <ellipse cx="65" cy="48" rx="55" ry="18"/>
+        <circle cx="45" cy="34" r="22"/>
+        <circle cx="78" cy="28" r="26"/>
+        <circle cx="100" cy="42" r="16"/>
+      </g>
+    </symbol>
+
+    <symbol id="sol" viewBox="0 0 100 100">
+      <g stroke="currentColor" stroke-width="6" stroke-linecap="round">
+        <line x1="50" y1="4" x2="50" y2="16"/><line x1="50" y1="84" x2="50" y2="96"/>
+        <line x1="4" y1="50" x2="16" y2="50"/><line x1="84" y1="50" x2="96" y2="50"/>
+        <line x1="17" y1="17" x2="25" y2="25"/><line x1="75" y1="75" x2="83" y2="83"/>
+        <line x1="83" y1="17" x2="75" y2="25"/><line x1="25" y1="75" x2="17" y2="83"/>
+      </g>
+      <circle cx="50" cy="50" r="24" fill="currentColor"/>
+      <circle cx="42" cy="46" r="3" fill="#f57f17"/><circle cx="58" cy="46" r="3" fill="#f57f17"/>
+      <path d="M40 56 Q50 66 60 56" stroke="#f57f17" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </symbol>
+
+    <symbol id="bote" viewBox="0 0 100 100">
+      <rect x="22" y="14" width="56" height="9" rx="4" fill="currentColor"/>
+      <rect x="40" y="7" width="20" height="9" rx="4" fill="currentColor"/>
+      <path d="M26 28 H74 L69 92 Q68.5 96 64 96 H36 Q31.5 96 31 92 Z" fill="currentColor"/>
+      <path d="M26 28 H74 L73.4 36 H26.6 Z" fill="#000000" opacity="0.12"/>
+      <g stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.85">
+        <line x1="42" y1="46" x2="43.5" y2="84"/><line x1="50" y1="46" x2="50" y2="84"/><line x1="58" y1="46" x2="56.5" y2="84"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ==================== BIENVENIDA ==================== -->
+<header class="cielo">
+  <svg class="sol" aria-hidden="true"><use href="#sol"/></svg>
+  <svg class="nube nube-1" aria-hidden="true"><use href="#nube"/></svg>
+  <svg class="nube nube-2" aria-hidden="true"><use href="#nube"/></svg>
+  <svg class="nube nube-3" aria-hidden="true"><use href="#nube"/></svg>
+
+  <svg class="hoja-cae" style="left:12%; animation-delay:0s;" aria-hidden="true"><use href="#hoja"/></svg>
+  <svg class="hoja-cae" style="left:30%; animation-delay:3s; color:#43a047;" aria-hidden="true"><use href="#hoja"/></svg>
+  <svg class="hoja-cae" style="left:55%; animation-delay:6s;" aria-hidden="true"><use href="#hoja"/></svg>
+  <svg class="hoja-cae" style="left:72%; animation-delay:9s; color:#2e7d32;" aria-hidden="true"><use href="#hoja"/></svg>
+  <svg class="hoja-cae" style="left:88%; animation-delay:4.5s;" aria-hidden="true"><use href="#hoja"/></svg>
+
+  <div class="hero-contenido">
+    <p class="saludo">🌿 ¡Hola, amiguito de la naturaleza!</p>
+    <h1>¡Bienvenidos a Naturaleza Digital!</h1>
+    <p>Aquí aprenderás a cuidar las plantas, separar la basura y proteger nuestro planeta. ¡Vamos a divertirnos!</p>
+    <a class="boton-grande" href="index.html">🌱 ¡Entrar al sitio!</a>
+  </div>
+
+  <div class="pradera" aria-hidden="true">
+    <svg class="planta p-brote solo-grande"><use href="#brote"/></svg>
+    <svg class="planta p-flor flor-roja"><use href="#flor"/></svg>
+    <svg class="planta p-arbol-m"><use href="#arbol"/></svg>
+    <svg class="planta p-flor flor-naranja solo-grande"><use href="#flor"/></svg>
+    <svg class="planta p-arbol-g"><use href="#arbol"/></svg>
+    <svg class="planta p-flor flor-rosa"><use href="#flor"/></svg>
+    <svg class="planta p-brote"><use href="#brote"/></svg>
+    <svg class="planta p-arbol-m solo-grande"><use href="#arbol"/></svg>
+    <svg class="planta p-flor flor-morada"><use href="#flor"/></svg>
+    <svg class="planta p-brote solo-grande"><use href="#brote"/></svg>
+  </div>
+  <div class="cesped"></div>
+</header>
+
+<main>
+
+  <section class="seccion">
+    <h2>¿Qué vamos a aprender?</h2>
+    <p class="subtitulo">¡Muchas cosas divertidas para cuidar nuestra escuela!</p>
+    <div class="rejilla rejilla-3">
+      <article class="tarjeta t-verde">
+        <span class="icono">🌳</span>
+        <h3>Cuidar las plantas</h3>
+        <p>Las plantas nos dan sombra, aire limpio y flores bonitas. ¡Hay que regarlas y no pisarlas!</p>
+      </article>
+      <article class="tarjeta t-azul">
+        <span class="icono">💧</span>
+        <h3>Ahorrar el agua</h3>
+        <p>El agua es un tesoro. Cierra bien la llave y riega las plantas con cuidado.</p>
+      </article>
+      <article class="tarjeta t-amarillo">
+        <span class="icono">♻️</span>
+        <h3>Separar la basura</h3>
+        <p>Cada cosa va en su bote. Así podemos reciclar y la escuela se mantiene limpia.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <h2>Los botes de colores</h2>
+    <p class="subtitulo">¿Sabes en cuál bote va cada cosa?</p>
+    <div class="rejilla rejilla-4">
+      <article class="bote bote-verde">
+        <svg aria-hidden="true"><use href="#bote"/></svg>
+        <h3>Bote verde</h3>
+        <p>🍌 Cáscaras y restos de comida</p>
+      </article>
+      <article class="bote bote-azul">
+        <svg aria-hidden="true"><use href="#bote"/></svg>
+        <h3>Bote azul</h3>
+        <p>🧴 Botellas y envases de plástico</p>
+      </article>
+      <article class="bote bote-amarillo">
+        <svg aria-hidden="true"><use href="#bote"/></svg>
+        <h3>Bote amarillo</h3>
+        <p>📄 Hojas y cartón limpios</p>
+      </article>
+      <article class="bote bote-gris">
+        <svg aria-hidden="true"><use href="#bote"/></svg>
+        <h3>Bote gris</h3>
+        <p>🧻 Pañuelos usados y cosas de higiene</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <h2>Las 3 R del planeta</h2>
+    <p class="subtitulo">Tres palabras mágicas para cuidar la naturaleza.</p>
+    <div class="rejilla rejilla-3">
+      <article class="tarjeta t-verde erre">
+        <span class="numero">1</span>
+        <div><h3>Reduce</h3><p>Usa menos cosas y evita la basura.</p></div>
+      </article>
+      <article class="tarjeta t-azul erre">
+        <span class="numero" style="background-color:#0288d1;">2</span>
+        <div><h3>Reutiliza</h3><p>Dale otra vida a tus cosas: frascos, cajas y hojas.</p></div>
+      </article>
+      <article class="tarjeta t-amarillo erre">
+        <span class="numero" style="background-color:#f9a825;">3</span>
+        <div><h3>Recicla</h3><p>Separa para que se conviertan en cosas nuevas.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="seccion invitacion">
+    <h2>🌎 ¡Conviértete en un Guardián de la Naturaleza!</h2>
+    <p>Entra al sitio, juega y descubre cuántos residuos se generan.</p>
+    <div class="botones">
+      <a class="boton boton-verde" href="index.html">🌱 Entrar al sitio</a>
+      <a class="boton" href="juego.html">🎮 Juego</a>
+      <a class="boton" href="calcula-residuos.html">♻️ Calcula tus residuos</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <p>EcoVivo - Proyecto Institucional de Cuidado Ambiental</p>
+  <p>2026 BIENVENIDA - Proyecto Escuela Comunidad, Preparatoria CECYTEM TULTITLAN</p>
+</footer>
+
+</body>
+</html>

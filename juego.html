@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoVivo - Juego Eco-Reto</title>
+
+<!-- PyScript: permite ejecutar Python dentro de la página (necesita internet) -->
+<link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
+<script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+/* ---------- Tarjetas ---------- */
+.tarjeta {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 25px;
+  border-left: 6px solid #2e7d32;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  animation: aparecer 0.35s ease-out;
+}
+.tarjeta h2 { color: #2e7d32; margin-top: 0; }
+.entrada { text-align: center; }
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reglas {
+  list-style: none;
+  padding: 14px 16px;
+  margin: 0 auto 20px auto;
+  max-width: 520px;
+  text-align: left;
+  background-color: #e8f5e9;
+  border: 2px solid #2e7d32;
+  border-radius: 8px;
+}
+.reglas li { margin: 4px 0; }
+
+/* ---------- Marcador ---------- */
+.marcador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.dato {
+  flex: 1 1 150px;
+  text-align: center;
+  font-weight: bold;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: #e1f5fe;
+  border: 2px solid #0288d1;
+  color: #0288d1;
+}
+.dato:nth-child(3) { background-color: #fffde7; border-color: #fbc02d; color: #f9a825; }
+
+.progreso {
+  height: 12px;
+  background-color: #eceff1;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.progreso-relleno {
+  height: 100%;
+  background-color: #2e7d32;
+  border-radius: 6px;
+  transition: width 0.4s;
+}
+
+/* ---------- Pregunta y opciones ---------- */
+.pregunta h2 { font-size: 1.3rem; line-height: 1.4; }
+
+.opciones { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #263238;
+  background-color: #e8f5e9;
+  border: 2px solid #2e7d32;
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: transform 0.15s, background-color 0.15s;
+}
+button.opcion:hover { background-color: #c8e6c9; transform: translateX(4px); }
+button.opcion:focus-visible,
+.boton-principal:focus-visible { outline: 3px solid #fbc02d; outline-offset: 2px; }
+
+.letra {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #2e7d32;
+  border-radius: 50%;
+}
+
+.opcion-bloqueada { cursor: default; opacity: 0.75; }
+.opcion-correcta   { opacity: 1; background-color: #c8e6c9; border-color: #2e7d32; border-width: 3px; font-weight: bold; }
+.opcion-incorrecta { opacity: 1; background-color: #ffebee; border-color: #c62828; }
+.opcion-incorrecta .letra { background-color: #c62828; }
+
+/* ---------- Mensajes de respuesta ---------- */
+.mensaje { border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; }
+.mensaje p { margin: 4px 0 0 0; }
+.mensaje-bien { background-color: #e8f5e9; border: 2px solid #2e7d32; color: #1b5e20; }
+.mensaje-mal  { background-color: #ffebee; border: 2px solid #c62828; color: #b71c1c; }
+
+/* ---------- Botón principal ---------- */
+.boton-principal {
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #2e7d32;
+  background-color: #fbc02d;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.boton-principal:hover { transform: scale(1.04); }
+.pregunta .boton-principal { width: 100%; }
+
+/* ---------- Resultados ---------- */
+.puntaje-final { font-size: 3rem; font-weight: bold; color: #2e7d32; margin: 0 0 10px 0; line-height: 1.2; }
+.puntaje-final span { font-size: 1.2rem; color: #263238; }
+
+.resumen { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+.resumen-dato {
+  flex: 1 1 160px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #263238;
+  background-color: #eceff1;
+}
+.resumen-dato strong { display: block; font-size: 1.6rem; }
+.resumen-bien  { background-color: #e8f5e9; border-color: #2e7d32; color: #2e7d32; }
+.resumen-mal   { background-color: #ffebee; border-color: #c62828; color: #c62828; }
+.resumen-racha { background-color: #fffde7; border-color: #fbc02d; color: #f9a825; }
+
+.mensaje-final {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #0288d1;
+  background-color: #e1f5fe;
+  border: 2px solid #0288d1;
+  border-radius: 8px;
+  padding: 12px 15px;
+}
+
+/* ---------- Pantallas pequeñas ---------- */
+@media (max-width: 600px) {
+    .pregunta h2 { font-size: 1.15rem; }
+  .boton-principal { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta, .progreso-relleno, .opcion, .boton-principal { animation: none; transition: none; }
+}
+
+.cargando { background-color:#e1f5fe; border:2px solid #0288d1; color:#0288d1; border-radius:8px; padding:8px 12px; font-weight:bold; text-align:center; }
+</style>
+</head>
+<body style="margin:0; font-family: Arial, Helvetica, sans-serif; background-color:#ffffff; color:#263238; line-height:1.6;">
+
+<header style="background-color:#2e7d32; color:#ffffff; padding:20px; text-align:center; border-bottom:5px solid #fbc02d;">
+  <h1 style="margin:0 0 15px 0; font-size:1.8rem;">Proyecto Institucional de Cuidado Ambiental</h1>
+  <p style="margin:0 0 15px 0;">Separación, Reducción y Manejo de Residuos</p>
+  <nav>
+    <a href="index.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Inicio</a>
+    <a href="galeria.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Tipos de Residuos</a>
+    <a href="plantas.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Guía Práctica</a>
+    <a href="herramientas.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Galería</a>
+    <a href="calcula-residuos.html" style="display:inline-block; color:#ffffff; background-color:#0288d1; text-decoration:none; padding:8px 16px; border-radius:8px; margin:4px;">Calcula tus residuos</a>
+    <a href="juego.html" style="display:inline-block; color:#2e7d32; background-color:#fbc02d; text-decoration:none; font-weight:bold; padding:8px 16px; border-radius:8px; margin:4px;">Juego</a>
+  </nav>
+</header>
+
+<main style="max-width:900px; margin:0 auto; padding:20px;">
+  <p id="cargando" class="cargando">⏳ Cargando Python... espera unos segundos (se necesita internet).</p>
+  <div id="juego"></div>
+</main>
+
+<footer style="background-color:#1b5e20;; color:#ffffff; padding:20px; text-align:center;">
+  <p style="margin:5px 0 0 0;">Juego - Proyecto Escuela Comunidad, Preparatoria CECYTEM TULTITLAN</p>
+</footer>
+
+<!-- Código en Python del juego -->
+<script type="py">
+# Eco-Reto - juego en Python (corre dentro de la página con PyScript)
+import random
+from pyscript import document, when
+
+TOTAL = 10
+PUNTOS_ACIERTO = 10
+PUNTOS_ERROR = 5
+
+# Banco de preguntas (hay más de 10; cada partida elige 10 al azar)
+preguntas = [
+    {
+        "pregunta": "Encuentras una botella de plástico en el área verde. ¿Qué haces?",
+        "opciones": ["Dejarla ahí, el viento se la llevará",
+                     "Recogerla y depositarla en el bote azul de plásticos",
+                     "Enterrarla en la tierra de las plantas",
+                     "Quemarla en el patio"],
+        "correcta": 1,
+        "explicacion": "Los plásticos se recogen y van al bote de reciclaje. Enterrarlos o quemarlos contamina."
+    },
+    {
+        "pregunta": "Una planta necesita agua. ¿Cuál es la acción correcta?",
+        "opciones": ["Regarla a mediodía, cuando hace más calor",
+                     "Regarla temprano o al atardecer, directo a la tierra",
+                     "Inundar la maceta para que dure varios días",
+                     "Mojar solo las hojas con la manguera a presión"],
+        "correcta": 1,
+        "explicacion": "Con el fresco se evapora menos agua y la raíz aprovecha mejor el riego."
+    },
+    {
+        "pregunta": "Tienes cáscaras de fruta y restos de comida. ¿En qué categoría deben colocarse?",
+        "opciones": ["Plástico", "Papel y cartón", "Orgánico", "Sanitario"],
+        "correcta": 2,
+        "explicacion": "Son residuos orgánicos: se descomponen y pueden convertirse en composta."
+    },
+    {
+        "pregunta": "Encuentras papel y cartón limpios. ¿Dónde deben ir?",
+        "opciones": ["Bote verde de orgánicos",
+                     "Bote amarillo de papel y cartón",
+                     "Bote gris de residuos sanitarios",
+                     "Al pasto, porque se descompone"],
+        "correcta": 1,
+        "explicacion": "El papel y cartón limpios se reciclan en el bote amarillo."
+    },
+    {
+        "pregunta": "Un compañero tira basura cerca de las plantas. ¿Qué deberías hacer?",
+        "opciones": ["Ignorarlo", "Tirar tú también tu basura",
+                     "Pedirle amablemente que la recoja y la deposite en el bote correcto",
+                     "Esconder la basura entre las hojas"],
+        "correcta": 2,
+        "explicacion": "Hablar con respeto ayuda a crear el hábito de cuidar los espacios de todos."
+    },
+    {
+        "pregunta": "¿Qué acción ayuda a reducir la generación de residuos?",
+        "opciones": ["Comprar productos con mucho empaque",
+                     "Usar una botella de agua reutilizable",
+                     "Usar vasos desechables en cada comida",
+                     "Tirar los cuadernos con hojas vacías"],
+        "correcta": 1,
+        "explicacion": "Reutilizar evita generar nuevos residuos de plástico."
+    },
+    {
+        "pregunta": "¿Cuál de estos materiales puede reciclarse?",
+        "opciones": ["Un pañuelo desechable usado", "Un cubrebocas usado",
+                     "Una botella de vidrio vacía", "Restos de comida con grasa"],
+        "correcta": 2,
+        "explicacion": "El vidrio se puede reciclar muchas veces. Los demás no son reciclables."
+    },
+    {
+        "pregunta": "¿Qué debes hacer antes de desechar correctamente un envase?",
+        "opciones": ["Dejarlo sucio para que se note que se usó",
+                     "Vaciarlo y enjuagarlo (y aplastarlo si es de plástico)",
+                     "Mezclarlo con los residuos orgánicos",
+                     "Romperlo en pedazos muy pequeños"],
+        "correcta": 1,
+        "explicacion": "Un envase limpio y aplastado se recicla mejor y ocupa menos espacio."
+    },
+    {
+        "pregunta": "Una planta tiene ramas secas y dañadas. ¿Qué es lo mejor?",
+        "opciones": ["Cortar todas las ramas, también las verdes",
+                     "Arrancar la planta completa",
+                     "Podar solo las ramas secas o dañadas con una herramienta limpia"],
+        "correcta": 2,
+        "explicacion": "Podar lo seco ayuda a que la planta crezca sana sin lastimarla de más."
+    },
+    {
+        "pregunta": "Vas a plantar un árbol joven en el patio. ¿Qué haces?",
+        "opciones": ["Haces un hoyo amplio, lo plantas y lo riegas bien",
+                     "Lo dejas sobre la tierra sin cubrir las raíces",
+                     "Lo plantas pegado a la pared del salón",
+                     "Lo plantas sin agua para que se acostumbre"],
+        "correcta": 0,
+        "explicacion": "Las raíces deben quedar cubiertas, con espacio para crecer y con agua al inicio."
+    },
+    {
+        "pregunta": "¿A qué categoría pertenece una lata de refresco vacía?",
+        "opciones": ["Orgánico", "Metal", "Papel y cartón", "Sanitario"],
+        "correcta": 1,
+        "explicacion": "Las latas son de metal (aluminio) y se pueden reciclar."
+    },
+    {
+        "pregunta": "¿Qué significan las 3 R del reciclaje?",
+        "opciones": ["Reducir, Reutilizar, Reciclar",
+                     "Romper, Revolver, Regalar",
+                     "Recoger, Reparar, Rellenar"],
+        "correcta": 0,
+        "explicacion": "Primero reducimos, luego reutilizamos y al final reciclamos."
+    },
+    {
+        "pregunta": "Tienes un frasco de vidrio limpio que todavía sirve. ¿Qué ayuda más a reducir residuos?",
+        "opciones": ["Reutilizarlo para guardar semillas o alimentos secos",
+                     "Tirarlo al bote gris",
+                     "Romperlo para que ocupe menos",
+                     "Dejarlo en el pasto"],
+        "correcta": 0,
+        "explicacion": "Reutilizar alarga la vida de los objetos y evita generar basura."
+    },
+    {
+        "pregunta": "¿Qué puedes hacer con hojas secas y cáscaras de fruta de la escuela?",
+        "opciones": ["Quemarlas", "Hacer composta para abonar las plantas",
+                     "Tirarlas junto con los plásticos", "Echarlas al drenaje"],
+        "correcta": 1,
+        "explicacion": "La composta convierte residuos orgánicos en abono natural."
+    },
+    {
+        "pregunta": "¿En qué bote van los pañuelos desechables usados?",
+        "opciones": ["Amarillo (papel)", "Verde (orgánicos)",
+                     "Gris (residuos sanitarios)", "Azul (plásticos)"],
+        "correcta": 2,
+        "explicacion": "Por higiene van en el bote gris, aparte de los reciclables."
+    },
+    {
+        "pregunta": "Notas una llave goteando en el jardín escolar. ¿Qué haces?",
+        "opciones": ["Nada, es muy poca agua",
+                     "Avisar a un maestro o al personal para que la reparen",
+                     "Dejarla abierta para las plantas",
+                     "Taparla con una bolsa"],
+        "correcta": 1,
+        "explicacion": "Una gota constante desperdicia mucha agua con el tiempo. Avisar ayuda a repararla."
+    },
+    {
+        "pregunta": "Tienes una hoja usada por un solo lado. ¿Qué es lo mejor?",
+        "opciones": ["Tirarla al bote gris",
+                     "Usar el otro lado antes de reciclarla",
+                     "Mezclarla con orgánicos mojados",
+                     "Quemarla"],
+        "correcta": 1,
+        "explicacion": "Usar ambos lados reduce el consumo de papel."
+    },
+    {
+        "pregunta": "¿Qué acción daña las plantas del área verde?",
+        "opciones": ["Caminar por los senderos", "Regar con medida",
+                     "Pisar o jugar sobre las plantas recién sembradas",
+                     "Retirar la basura"],
+        "correcta": 2,
+        "explicacion": "Pisar las plantas jóvenes rompe tallos y raíces."
+    },
+    {
+        "pregunta": "Un papel está muy sucio o mojado. ¿Se puede reciclar?",
+        "opciones": ["Sí, siempre", "No, el papel mojado o muy sucio no se recicla",
+                     "Solo si es de color"],
+        "correcta": 1,
+        "explicacion": "El papel mojado o sucio contamina el resto y ya no se puede reciclar."
+    },
+    {
+        "pregunta": "¿Qué ayuda más a generar menos basura al comprar en la tienda escolar?",
+        "opciones": ["Pedir una bolsa nueva para cada producto",
+                     "Llevar tu propia bolsa o mochila",
+                     "Elegir siempre envases individuales"],
+        "correcta": 1,
+        "explicacion": "Llevar tus propias bolsas evita residuos innecesarios."
+    },
+    {
+        "pregunta": "¿Qué tipo de residuo va en el bote azul?",
+        "opciones": ["Botellas y envases de plástico", "Cáscaras de fruta",
+                     "Cajas de cartón", "Pañuelos usados"],
+        "correcta": 0,
+        "explicacion": "El bote azul es para plásticos y PET que se pueden reciclar."
+    },
+]
+
+
+estado = {}
+
+
+def nueva_partida():
+    ids = random.sample(range(len(preguntas)), TOTAL)
+    ordenes = [random.sample(range(len(preguntas[i]["opciones"])), len(preguntas[i]["opciones"])) for i in ids]
+    estado.clear()
+    estado.update({"ids": ids, "ordenes": ordenes, "actual": 0, "puntos": 0, "racha": 0,
+                   "mejor_racha": 0, "correctas": 0, "incorrectas": 0,
+                   "fase": "pregunta", "elegida": None})
+
+
+def responder(elegida):
+    p = preguntas[estado["ids"][estado["actual"]]]
+    if elegida == p["correcta"]:
+        estado["puntos"] += PUNTOS_ACIERTO
+        estado["correctas"] += 1
+        estado["racha"] += 1
+        estado["mejor_racha"] = max(estado["mejor_racha"], estado["racha"])
+    else:
+        estado["puntos"] = max(0, estado["puntos"] - PUNTOS_ERROR)   # nunca menor que 0
+        estado["incorrectas"] += 1
+        estado["racha"] = 0
+    estado["elegida"] = elegida
+    estado["fase"] = "respuesta"
+
+
+def siguiente():
+    estado["actual"] += 1
+    estado["elegida"] = None
+    estado["fase"] = "fin" if estado["actual"] >= TOTAL else "pregunta"
+
+
+def mensaje_final(puntos):
+    if puntos <= 30:
+        return "Puedes mejorar. ¡Aprende más sobre el cuidado del medio ambiente!"
+    if puntos <= 70:
+        return "¡Buen trabajo! Ya tienes buenos conocimientos ambientales."
+    return "¡Excelente! Eres un experto del Eco-Reto."
+
+
+def html_inicio():
+    return (
+        '<section class="tarjeta entrada"><h2>🎮 Eco-Reto</h2>'
+        '<p>Pon a prueba lo que sabes sobre el cuidado de las áreas verdes de la escuela y la separación de residuos.</p>'
+        '<ul class="reglas">'
+        f'<li>🌿 Cada partida tiene <strong>{TOTAL} preguntas</strong>.</li>'
+        '<li>✅ Respuesta correcta: <strong>+10 puntos</strong>.</li>'
+        '<li>❌ Respuesta incorrecta: <strong>-5 puntos</strong> (el puntaje nunca baja de 0).</li>'
+        '<li>🔥 Acierta varias seguidas para aumentar tu racha.</li></ul>'
+        '<button class="boton-principal" data-accion="iniciar">🌳 Comenzar el reto</button></section>'
+    )
+
+
+def html_pregunta():
+    n = estado["actual"]
+    p = preguntas[estado["ids"][n]]
+    respondida = estado["fase"] == "respuesta"
+    avance = round((n + (1 if respondida else 0)) * 100 / TOTAL)
+
+    h = '<section class="marcador">'
+    h += f'<div class="dato">Pregunta {n + 1} de {TOTAL}</div>'
+    h += f'<div class="dato">⭐ Puntaje: {estado["puntos"]}</div>'
+    h += f'<div class="dato">🔥 Racha: {estado["racha"]}</div></section>'
+    h += f'<div class="progreso"><div class="progreso-relleno" style="width:{avance}%;"></div></div>'
+    h += f'<section class="tarjeta pregunta"><h2>🌿 {p["pregunta"]}</h2><div class="opciones">'
+
+    for pos, i in enumerate(estado["ordenes"][n]):
+        letra = "ABCD"[pos]
+        texto = p["opciones"][i]
+        if not respondida:
+            h += f'<button class="opcion" data-accion="responder" data-valor="{i}"><span class="letra">{letra}</span>{texto}</button>'
+        else:
+            clase = "opcion opcion-bloqueada"
+            if i == p["correcta"]:
+                clase += " opcion-correcta"
+            elif i == estado["elegida"]:
+                clase += " opcion-incorrecta"
+            h += f'<div class="{clase}"><span class="letra">{letra}</span>{texto}</div>'
+    h += '</div>'
+
+    if respondida:
+        if estado["elegida"] == p["correcta"]:
+            h += f'<div class="mensaje mensaje-bien"><strong>✅ ¡Correcto! +{PUNTOS_ACIERTO} puntos</strong><p>{p["explicacion"]}</p></div>'
+        else:
+            h += f'<div class="mensaje mensaje-mal"><strong>❌ Incorrecto. -{PUNTOS_ERROR} puntos</strong><p>{p["explicacion"]}</p></div>'
+        texto_boton = "🏆 Ver resultados" if n + 1 >= TOTAL else "Siguiente pregunta"
+        h += f'<button class="boton-principal" data-accion="siguiente">{texto_boton}</button>'
+    h += '</section>'
+    return h
+
+
+def html_fin():
+    h = '<section class="tarjeta entrada"><h2>🏆 ¡Reto terminado!</h2>'
+    h += f'<p class="puntaje-final">{estado["puntos"]} <span>puntos</span></p>'
+    h += '<div class="resumen">'
+    h += f'<div class="resumen-dato resumen-bien"><strong>{estado["correctas"]}</strong>Respuestas correctas</div>'
+    h += f'<div class="resumen-dato resumen-mal"><strong>{estado["incorrectas"]}</strong>Respuestas incorrectas</div>'
+    h += f'<div class="resumen-dato resumen-racha"><strong>🔥 {estado["mejor_racha"]}</strong>Mejor racha</div></div>'
+    h += f'<p class="mensaje-final">{mensaje_final(estado["puntos"])}</p>'
+    h += '<button class="boton-principal" data-accion="iniciar">🔄 Jugar de nuevo</button></section>'
+    return h
+
+
+def dibujar():
+    fase = estado.get("fase")
+    if fase is None:
+        html = html_inicio()
+    elif fase == "fin":
+        html = html_fin()
+    else:
+        html = html_pregunta()
+    document.querySelector("#juego").innerHTML = html
+
+
+@when("click", "#juego")
+def al_click(event):
+    boton = event.target.closest("button")
+    if boton is None:
+        return
+    accion = boton.getAttribute("data-accion")
+    fase = estado.get("fase")
+    if accion == "iniciar":
+        nueva_partida()
+    elif accion == "responder" and fase == "pregunta":
+        responder(int(boton.getAttribute("data-valor")))
+    elif accion == "siguiente" and fase == "respuesta":
+        siguiente()
+    dibujar()
+
+
+# Python ya cargó: ocultar el aviso y mostrar la pantalla de inicio
+document.querySelector("#cargando").style.display = "none"
+dibujar()
+</script>
+
+</body>
+</html>
